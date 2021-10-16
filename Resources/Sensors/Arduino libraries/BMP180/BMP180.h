@@ -1,6 +1,5 @@
 /*	BMP180 pressure sensor Library :
-*		This library is an optimized version of the arduino BMP180 
-*		library : 
+*		This library is an optimized version of the arduino BMP180 library 
 *			
 *	This version allows one to easily configure and retrieve pressure and temperature
 *	measurements.
