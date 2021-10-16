@@ -18,7 +18,7 @@
 
 BMP180::BMP180() 
 {
-  this->oss = 0;
+	this->oss = 0;
 }
 
 
