@@ -18,7 +18,7 @@
 
 BMP180::BMP180() 
 {
-  this->oss = 0;
+	this->oss = 0;
 }
 
 
@@ -31,19 +31,21 @@ void BMP180::initialize()
 	this->AC1 = static_cast<int16_t>(I2C::readBurstRegValue(BMP180_DEVICE_ADDR, BMP180_COEFF_AC1_REG_ADDR, BMP180_COEFF_REG_SIZE));
 	this->AC2 = static_cast<int16_t>(I2C::readBurstRegValue(BMP180_DEVICE_ADDR, BMP180_COEFF_AC2_REG_ADDR, BMP180_COEFF_REG_SIZE));
 	this->AC3 = static_cast<int16_t>(I2C::readBurstRegValue(BMP180_DEVICE_ADDR, BMP180_COEFF_AC3_REG_ADDR, BMP180_COEFF_REG_SIZE));
+	
 	this->AC4 = I2C::readBurstRegValue(BMP180_DEVICE_ADDR, BMP180_COEFF_AC4_REG_ADDR, BMP180_COEFF_REG_SIZE);
 	this->AC5 = I2C::readBurstRegValue(BMP180_DEVICE_ADDR, BMP180_COEFF_AC5_REG_ADDR, BMP180_COEFF_REG_SIZE);
 	this->AC6 = I2C::readBurstRegValue(BMP180_DEVICE_ADDR, BMP180_COEFF_AC6_REG_ADDR, BMP180_COEFF_REG_SIZE);
+	
 	this->B_1 = static_cast<int16_t>(I2C::readBurstRegValue(BMP180_DEVICE_ADDR, BMP180_COEFF_B1_REG_ADDR, BMP180_COEFF_REG_SIZE));
 	this->B_2 = static_cast<int16_t>(I2C::readBurstRegValue(BMP180_DEVICE_ADDR, BMP180_COEFF_B2_REG_ADDR, BMP180_COEFF_REG_SIZE));
+	
 	this->MB = static_cast<int16_t>(I2C::readBurstRegValue(BMP180_DEVICE_ADDR, BMP180_COEFF_MB_REG_ADDR, BMP180_COEFF_REG_SIZE));
 	this->MC = static_cast<int16_t>(I2C::readBurstRegValue(BMP180_DEVICE_ADDR, BMP180_COEFF_MC_REG_ADDR, BMP180_COEFF_REG_SIZE));
 	this->MD = static_cast<int16_t>(I2C::readBurstRegValue(BMP180_DEVICE_ADDR, BMP180_COEFF_MD_REG_ADDR, BMP180_COEFF_REG_SIZE));
 	
 	delay(100);
 	
-	// device full reset
-	I2C::writeRegValue(BMP180_DEVICE_ADDR, BMP180_FACTORY_RESET_REG_ADDR, BMP180_FACTORY_RESET_REG_VALUE);
+	I2C::writeRegValue(BMP180_DEVICE_ADDR, BMP180_FACTORY_RESET_REG_ADDR, BMP180_FACTORY_RESET_REG_VALUE); // device full reset
 }
 
 /*
@@ -110,10 +112,8 @@ void BMP180::get_temperature_and_pressure(int32_t* _temperature, int32_t* _press
 	uint32_t B4 = static_cast<uint32_t>(this->AC4) * (static_cast<uint32_t>(X3 + 32768)) >> 15;
 	uint32_t B7 = static_cast<uint32_t>(UP - B3) * (50000 >> this->oss);
 	
-	if (B7 < 0x80000000)
-		(*_pressure) = (B7 << 1) / B4;
-	else
-		(*_pressure) = (B7 / B4) << 1;
+	if (B7 < 0x80000000)	(*_pressure) = (B7 << 1) / B4;
+	else			(*_pressure) = (B7 / B4) << 1;
 	
 	X1 = ((*_pressure) >> 8) * ((*_pressure) >> 8);
 	X1 = (X1 * 3038) >> 16;
