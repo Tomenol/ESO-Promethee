@@ -30,26 +30,28 @@ void BMP180::initialize()
 	this->AC1 = static_cast<int16_t>(I2C::readBurstRegValue(BMP180_DEVICE_ADDR, BMP180_COEFF_AC1_REG_ADDR, BMP180_COEFF_REG_SIZE));
 	this->AC2 = static_cast<int16_t>(I2C::readBurstRegValue(BMP180_DEVICE_ADDR, BMP180_COEFF_AC2_REG_ADDR, BMP180_COEFF_REG_SIZE));
 	this->AC3 = static_cast<int16_t>(I2C::readBurstRegValue(BMP180_DEVICE_ADDR, BMP180_COEFF_AC3_REG_ADDR, BMP180_COEFF_REG_SIZE));
+	
 	this->AC4 = I2C::readBurstRegValue(BMP180_DEVICE_ADDR, BMP180_COEFF_AC4_REG_ADDR, BMP180_COEFF_REG_SIZE);
 	this->AC5 = I2C::readBurstRegValue(BMP180_DEVICE_ADDR, BMP180_COEFF_AC5_REG_ADDR, BMP180_COEFF_REG_SIZE);
 	this->AC6 = I2C::readBurstRegValue(BMP180_DEVICE_ADDR, BMP180_COEFF_AC6_REG_ADDR, BMP180_COEFF_REG_SIZE);
+	
 	this->B_1 = static_cast<int16_t>(I2C::readBurstRegValue(BMP180_DEVICE_ADDR, BMP180_COEFF_B1_REG_ADDR, BMP180_COEFF_REG_SIZE));
 	this->B_2 = static_cast<int16_t>(I2C::readBurstRegValue(BMP180_DEVICE_ADDR, BMP180_COEFF_B2_REG_ADDR, BMP180_COEFF_REG_SIZE));
+	
 	this->MB = static_cast<int16_t>(I2C::readBurstRegValue(BMP180_DEVICE_ADDR, BMP180_COEFF_MB_REG_ADDR, BMP180_COEFF_REG_SIZE));
 	this->MC = static_cast<int16_t>(I2C::readBurstRegValue(BMP180_DEVICE_ADDR, BMP180_COEFF_MC_REG_ADDR, BMP180_COEFF_REG_SIZE));
 	this->MD = static_cast<int16_t>(I2C::readBurstRegValue(BMP180_DEVICE_ADDR, BMP180_COEFF_MD_REG_ADDR, BMP180_COEFF_REG_SIZE));
 	
 	delay(100);
 	
-	// device full reset
-	I2C::writeRegValue(BMP180_DEVICE_ADDR, BMP180_FACTORY_RESET_REG_ADDR, BMP180_FACTORY_RESET_REG_VALUE);
+	I2C::writeRegValue(BMP180_DEVICE_ADDR, BMP180_FACTORY_RESET_REG_ADDR, BMP180_FACTORY_RESET_REG_VALUE);	// device full reset
 }
 
 /*
 *	Retreives raw temperature measurement -> 5ms (oss = 0)
 *
 *	Return value : 
-*		- (int32_t) raw temperature measurement
+*	  - (int32_t) raw temperature measurement
 */	
 int32_t BMP180::getRawTemperature()
 {
@@ -63,7 +65,7 @@ int32_t BMP180::getRawTemperature()
 *	Retreives raw pressure measurement -> 5ms (oss = 0)
 *
 *	Return value : 
-*		- (int32_t) raw pressure measurement
+*	  - (int32_t) raw pressure measurement
 */	
 int32_t BMP180::getRawPressure()
 {
@@ -77,8 +79,8 @@ int32_t BMP180::getRawPressure()
 *	Computes corrected temperature and pressure measurements
 *
 *	input values : 
-*		- _temperature (int32_t*) : address of the corrected temperature measurement result
-*		- _pressure (int32_t*) : address of the corrected pressure measurement result
+*	  - _temperature (int32_t*) : address of the corrected temperature measurement result
+*	  - _pressure (int32_t*) : address of the corrected pressure measurement result
 */	
 void BMP180::get_temperature_and_pressure(int32_t* _temperature, int32_t* _pressure)
 {
