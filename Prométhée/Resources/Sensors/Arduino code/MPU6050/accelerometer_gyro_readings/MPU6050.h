@@ -20,8 +20,8 @@
 #ifndef MPU_6050_H_
 #define MPU_6050_H_
 
-#define LSB_ACCEL_MEASUREMENT 				2048.0
-#define LSB_GYRO_MEASUREMENT 				65.5
+#define LSB_ACCEL_MEASUREMENT 			2048.0
+#define LSB_GYRO_MEASUREMENT 			65.5
 
 #define MPU6050_RA_ACCEL_XOUT_H     		0x3B
 
