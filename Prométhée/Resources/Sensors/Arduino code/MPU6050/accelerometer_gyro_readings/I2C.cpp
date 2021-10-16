@@ -32,15 +32,16 @@ uint8_t I2C::readRegValue(uint8_t _dev_addr, uint8_t _reg_addr)
 {
 	uint32_t data = 0;
 
-  Wire.beginTransmission(_dev_addr);
-  Wire.write(_reg_addr);
-  Wire.endTransmission();
+	Wire.beginTransmission(_dev_addr);
+	Wire.write(_reg_addr);
+	Wire.endTransmission();
 
-  Wire.beginTransmission(_dev_addr);
-  Wire.requestFrom(_dev_addr, (uint8_t) 1);
-  data = Wire.read();
-  Wire.endTransmission();
-  return data;
+	Wire.beginTransmission(_dev_addr);
+	Wire.requestFrom(_dev_addr, (uint8_t) 1);
+	data = Wire.read();
+	Wire.endTransmission();
+	
+	return data;
 }
 
 /*
@@ -61,8 +62,8 @@ uint32_t I2C::readBurstRegValue(uint8_t _dev_addr, uint8_t _starting_reg_addr, u
 	Wire.beginTransmission(_dev_addr);
 	Wire.write(_starting_reg_addr);
 	Wire.endTransmission();
-  
-  Wire.beginTransmission(_dev_addr);
+
+	Wire.beginTransmission(_dev_addr);
 	Wire.requestFrom(_dev_addr, _len);
 
 	for (uint8_t i = 0; i < _len; i++)
