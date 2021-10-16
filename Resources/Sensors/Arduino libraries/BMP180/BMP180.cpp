@@ -86,14 +86,14 @@ void BMP180::get_temperature_and_pressure(int32_t* _temperature, int32_t* _press
 	int32_t UT = getRawTemperature();
 	int32_t UP = getRawPressure();
 
-	/* temperature correction */
+	// temperature correction
 	int32_t X1 = ((UT - static_cast<int32_t>(this->AC6)) * static_cast<int32_t>(this->AC5)) >> 15;
 	int32_t X2 = (static_cast<int32_t>(this->MC) << 11) / (X1 + static_cast<int32_t>(this->MD));
 	uint32_t B5 = X1 + X2;
 	
 	*_temperature = (B5 + 8) >> 4;
 	
-	/* pressure correction */
+	// pressure correction
 	int32_t p = 0;
 	int32_t B6 = B5 - 4000;
 	
