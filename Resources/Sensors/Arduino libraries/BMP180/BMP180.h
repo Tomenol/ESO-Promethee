@@ -50,30 +50,30 @@
 
 class BMP180
 {
-	private:
-		int16_t AC1;
-		int16_t AC2;
-		int16_t AC3;
-		int16_t MB;
-		int16_t MC;
-		int16_t MD;
-		int16_t B_1;
-		int16_t B_2;
-		
-		uint16_t AC4;
-		uint16_t AC5;
-		uint16_t AC6;
-		
-		uint8_t oss;
-		
-	public:
-		BMP180();
+private:
+	int16_t AC1;
+	int16_t AC2;
+	int16_t AC3;
+	int16_t MB;
+	int16_t MC;
+	int16_t MD;
+	int16_t B_1;
+	int16_t B_2;
 
-    void initialize();
-		int32_t getRawTemperature();
-		int32_t getRawPressure();
-		
-		void get_temperature_and_pressure(int32_t *_temperature, int32_t *_pressure);
+	uint16_t AC4;
+	uint16_t AC5;
+	uint16_t AC6;
+
+	uint8_t oss;
+
+public:
+	BMP180();
+
+void initialize();
+	int32_t getRawTemperature();
+	int32_t getRawPressure();
+
+	void get_temperature_and_pressure(int32_t *_temperature, int32_t *_pressure);
 	
 	
 };
