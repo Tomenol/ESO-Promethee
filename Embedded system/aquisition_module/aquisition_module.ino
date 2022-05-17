@@ -110,24 +110,24 @@ void setup()
 // *******************************
 void loop() 
 {
-  new_gps_data = 0;
   
   if(gnss_receiver.available() > 0)
   {
     char c = gnss_receiver.read();
     //Serial.print(c);
     
-    if(gnss_receiver.newNMEAreceived())
+    if(gnss_receiver.newNMEAreceived() && new_gps_data == 0)
     {
       if (gnss_receiver.parse(gnss_receiver.lastNMEA()))
       {
+        Serial.println(gnss_receiver.lastNMEA());
         new_gps_data = 1;
       }
     }
   }
-
   if(millis() >= t_start + PERIODICITY)
   {
+    //while(millis()<t_start + PERIODICITY);
     t_start = millis();
     
     if(bmp_280.readValues(&temperature, &pressure) == 0);
@@ -142,7 +142,7 @@ void loop()
     mpu9250_2.getRawMagVector(mag_meas2);
     
     Serial.print("$");
-    Serial.print(t_stop - PERIODICITY);
+    Serial.print(t_start);
     Serial.print(";");
     Serial.print(accel1[0]);
     Serial.print(";");
@@ -229,5 +229,7 @@ void loop()
       Serial.println("0.00;E;0.00;N;0.00;0.00;0.00;0.00;0.00;0;0;0;0.00;0;0;0*");
       digitalWrite(MASTER_PIN_LED_FIX, 0);
     }
+    
+  new_gps_data = 0;
   }
 }
