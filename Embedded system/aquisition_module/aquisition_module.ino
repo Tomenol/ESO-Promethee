@@ -108,19 +108,13 @@ void setup()
   sei();
   
   delay(1000);
-<<<<<<< HEAD
 
-  t_stop = 0;
-=======
->>>>>>> 1168c86 (added ISR for gps measurements)
 }
 
 // *******************************
 //   MAIN LOOP : data acquisition
 // *******************************
 void loop() 
-<<<<<<< HEAD
-=======
 {  
   t_start = millis();
 
@@ -142,9 +136,7 @@ void loop()
  *    Gathers the measurements from the gps (low data rates).
  */
 uint8_t gps_measurements()
->>>>>>> 1168c86 (added ISR for gps measurements)
 {
-  
   if(gnss_receiver.available() > 0)
   {
     char c = gnss_receiver.read();
