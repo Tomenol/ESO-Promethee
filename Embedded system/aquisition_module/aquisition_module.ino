@@ -37,7 +37,7 @@ double altitude_pressure;
 //         IMUs : MPU9250
 // *******************************
 
-uint32_t t_stop;
+uint32_t t_start;
 
 // IMU sensor objects
 MPU9250 mpu9250_1(0x68);
@@ -102,21 +102,17 @@ void setup()
 
   delay(1000);
 
-<<<<<<< HEAD
-  t_stop = millis() + PERIODICITY;
-=======
   t_stop = 0;
->>>>>>> 4203fcb (Update aquisition_module.ino)
 }
 
 // *******************************
 //   MAIN LOOP : data acquisition
 // *******************************
 void loop() 
-{  
+{
   new_gps_data = 0;
-
-  if(gnss_receiver.available()>0)
+  
+  if(gnss_receiver.available() > 0)
   {
     char c = gnss_receiver.read();
     //Serial.print(c);
@@ -130,8 +126,10 @@ void loop()
     }
   }
 
-  if(millis() >= t_stop)
+  if(millis() >= t_start + PERIODICITY)
   {
+    t_start = millis();
+    
     if(bmp_280.readValues(&temperature, &pressure) == 0);
     else altitude_pressure = bmp_280.getAltitude(pressure, temperature);
 
@@ -225,13 +223,11 @@ void loop()
       Serial.println("*");
       
       digitalWrite(MASTER_PIN_LED_FIX,1);
-      
     }
     else
     {
       Serial.println("0.00;E;0.00;N;0.00;0.00;0.00;0.00;0.00;0;0;0;0.00;0;0;0*");
       digitalWrite(MASTER_PIN_LED_FIX, 0);
     }
-    t_stop = millis() + PERIODICITY;
   }
 }
