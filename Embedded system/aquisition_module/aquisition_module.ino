@@ -95,13 +95,6 @@ void setup()
   bmp_280.setReferenceAltitude(0);
   digitalWrite(MASTER_POWER_INIT, 1);
 
-  cli();
-  PCICR |= B00000001; // Enable interrupts on PB port -> D8 to D13 pins
-  
-  PCMSK0 |= B00000010; // Trigger interrupts on pins D10 : GPS_TX_PIN -> try both if this doesn't work !
-  // PCMSK0 |= B00000100; // Trigger interrupts on pins D9 : GPS_EX_PIN
-  sei();
-  
   delay(1000);
 }
 
@@ -117,7 +110,7 @@ void loop()
   // gather measurements
   while(millis() - t_start < PERIODICITY)
   {
-    //gps_measurements(); // reads the measurements from the gps
+    gps_measurements(); // reads the measurements from the gps
   }
 
   send_data_to_slave(); // send data to slave for storage
@@ -169,10 +162,12 @@ uint8_t high_rate_measurements()
   mpu9250_1.getRawAccelerationVector(accel1);
   mpu9250_1.getRawAngularVelocityVector(gyro1);
   mpu9250_1.getRawMagVector(mag_meas1);
+  gps_measurements();
 
   mpu9250_2.getRawAccelerationVector(accel2);
   mpu9250_2.getRawAngularVelocityVector(gyro2);
   mpu9250_2.getRawMagVector(mag_meas2);
+  gps_measurements();
 
   return 1;
 }
@@ -190,6 +185,8 @@ uint8_t send_data_to_slave()
   Serial.print(";");
   Serial.print(accel1[1]);
   Serial.print(";");
+  gps_measurements();
+  
   Serial.print(accel1[2]);
   Serial.print(";");
   Serial.print(accel2[0]);
@@ -198,38 +195,48 @@ uint8_t send_data_to_slave()
   Serial.print(";");
   Serial.print(accel2[2]);
   Serial.print(";");
+  gps_measurements();
+  
   Serial.print(gyro1[0]);
   Serial.print(";");
   Serial.print(gyro1[1]);
   Serial.print(";");
   Serial.print(gyro1[2]);
   Serial.print(";");
+  gps_measurements();
+  
   Serial.print(gyro2[0]);
   Serial.print(";");
   Serial.print(gyro2[1]);
   Serial.print(";");
   Serial.print(gyro2[2]);
   Serial.print(";");
+  gps_measurements();
+  
   Serial.print(mag_meas1[0]);
   Serial.print(";");
   Serial.print(mag_meas1[1]);
   Serial.print(";");
   Serial.print(mag_meas1[2]);
   Serial.print(";");
+  gps_measurements();
+  
   Serial.print(mag_meas2[0]);
   Serial.print(";");
   Serial.print(mag_meas2[1]);
   Serial.print(";");
   Serial.print(mag_meas2[2]);
   Serial.print(";");
-
+  gps_measurements();
+  
   Serial.print(pressure);
   Serial.print(";");
   Serial.print(temperature);
   Serial.print(";");
   Serial.print(altitude_pressure);
   Serial.print(";");
-
+  gps_measurements();
+  
   //gps
   if (gnss_receiver.fix)
   {
@@ -241,12 +248,14 @@ uint8_t send_data_to_slave()
     Serial.print(";");
     Serial.print(gnss_receiver.lat);
     Serial.print(";");
+    gps_measurements();
     Serial.print(gnss_receiver.altitude);
     Serial.print(";");
     Serial.print(gnss_receiver.speed);
     Serial.print(";");
     Serial.print(gnss_receiver.angle);
     Serial.print(";"); 
+    gps_measurements();
 
     Serial.print((gnss_receiver.hour+2)%24, DEC);
     Serial.print(";");
@@ -254,6 +263,7 @@ uint8_t send_data_to_slave()
     Serial.print(";");
     Serial.print(gnss_receiver.seconds, DEC);
     Serial.print(";");
+    gps_measurements();
   
     Serial.print((int)gnss_receiver.fixquality);
     Serial.print(";");
@@ -263,20 +273,17 @@ uint8_t send_data_to_slave()
     Serial.print(";");
     Serial.print((int)gnss_receiver.fix, DEC);
     Serial.println("*");
+    gps_measurements();
     
     digitalWrite(MASTER_PIN_LED_FIX,1);
   }
   else
   {
     Serial.println("0.00;E;0.00;N;0.00;0.00;0.00;0.00;0.00;0;0;0;0.00;0;0;0*");
+    gps_measurements();
+    
     digitalWrite(MASTER_PIN_LED_FIX, 0);
   }
 
   return 1;
-}
-
-// read gps whenever pin change detected on TX/RX
-ISR (PCINT0_vect) 
-{
-  gps_measurements();
 }
