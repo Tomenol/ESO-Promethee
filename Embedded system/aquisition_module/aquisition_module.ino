@@ -102,7 +102,11 @@ void setup()
 
   delay(1000);
 
+<<<<<<< HEAD
   t_stop = millis() + PERIODICITY;
+=======
+  t_stop = 0;
+>>>>>>> 4203fcb (Update aquisition_module.ino)
 }
 
 // *******************************
@@ -130,7 +134,7 @@ void loop()
   {
     if(bmp_280.readValues(&temperature, &pressure) == 0);
     else altitude_pressure = bmp_280.getAltitude(pressure, temperature);
-    
+
     mpu9250_1.getRawAccelerationVector(accel1);
     mpu9250_1.getRawAngularVelocityVector(gyro1);
     mpu9250_1.getRawMagVector(mag_meas1);
@@ -204,7 +208,7 @@ void loop()
       Serial.print(gnss_receiver.angle);
       Serial.print(";"); 
      
-      Serial.print(gnss_receiver.hour, DEC);
+      Serial.print((gnss_receiver.hour+2)%24, DEC);
       Serial.print(";");
       Serial.print(gnss_receiver.minute, DEC);
       Serial.print(";");
@@ -218,16 +222,16 @@ void loop()
       Serial.print(new_gps_data, DEC);
       Serial.print(";");
       Serial.print((int)gnss_receiver.fix, DEC);
-      Serial.print("*");
+      Serial.println("*");
       
       digitalWrite(MASTER_PIN_LED_FIX,1);
+      
     }
     else
     {
-      Serial.print("0.00;E;0.00;N;0.00;0.00;0.00;0.00;0.00;0;0;0;0.00;0;0;0*");
+      Serial.println("0.00;E;0.00;N;0.00;0.00;0.00;0.00;0.00;0;0;0;0.00;0;0;0*");
       digitalWrite(MASTER_PIN_LED_FIX, 0);
     }
-
     t_stop = millis() + PERIODICITY;
   }
 }
