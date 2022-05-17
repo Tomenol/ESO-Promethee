@@ -53,7 +53,7 @@ double accel2[3], gyro2[3], mag_meas2[3];
 // *******************************
 
 // GPS library 
-SoftwareSerial gps_serial_bus(GPS_TX_PIN, GPS_RX_PIN);
+SoftwareSerial gps_serial_bus(GPS_TX_PIN, GPS_RX_PIN); // rx, tx as seen from the arduino
 Adafruit_GPS gnss_receiver(&gps_serial_bus);
 
 uint8_t new_gps_data;
@@ -100,15 +100,49 @@ void setup()
   bmp_280.setReferenceAltitude(0);
   digitalWrite(MASTER_POWER_INIT, 1);
 
+  cli();
+  PCICR |= B00000001; // Enable interrupts on PB port -> D8 to D13 pins
+  
+  PCMSK0 |= B00000010; // Trigger interrupts on pins D10 : GPS_TX_PIN -> try both if this doesn't work !
+  // PCMSK0 |= B00000100; // Trigger interrupts on pins D9 : GPS_EX_PIN
+  sei();
+  
   delay(1000);
+<<<<<<< HEAD
 
   t_stop = 0;
+=======
+>>>>>>> 1168c86 (added ISR for gps measurements)
 }
 
 // *******************************
 //   MAIN LOOP : data acquisition
 // *******************************
 void loop() 
+<<<<<<< HEAD
+=======
+{  
+  t_start = millis();
+
+  high_rate_measurements(); // gather pressure and IMU measurements
+
+  // gather measurements
+  while(millis() - t_start < PERIODICITY)
+  {
+    //gps_measurements(); // reads the measurements from the gps
+  }
+
+  send_data_to_slave(); // send data to slave for storage
+
+  new_gps_data = 0;
+}
+
+/*
+ * Function gps_measurements() :
+ *    Gathers the measurements from the gps (low data rates).
+ */
+uint8_t gps_measurements()
+>>>>>>> 1168c86 (added ISR for gps measurements)
 {
   
   if(gnss_receiver.available() > 0)
@@ -232,4 +266,10 @@ void loop()
     
   new_gps_data = 0;
   }
+}
+
+// read gps whenever pin change detected on TX/RX
+ISR (PCINT0_vect) 
+{
+  gps_measurements();
 }
