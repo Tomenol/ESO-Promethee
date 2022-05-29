@@ -47,6 +47,9 @@ MPU9250 mpu9250_2(0x69);
 double accel1[3], gyro1[3], mag_meas1[3];
 double accel2[3], gyro2[3], mag_meas2[3];
 
+// data sentence :          ax1    ay1    az1    ax2    ay2    az2    wx1      wy1      wz1      wx2      wy2      wz2      mx1      my1      mz1      mx2      my2      mz2      P          T      zP       lon     d lat     d speed    dir
+char data_sentence[255] = "$+00.00;+00.00;+00.00;+00.00;+00.00;+00.00;+0000.00;+0000.00;+0000.00;+0000.00;+0000.00;+0000.00;+0000.00;+0000.00;+0000.00;+0000.00;+0000.00;+0000.00;+000000.00;+00.00;+0000.00;+000.00;-;+000.00;-;+0000.00;+000.00;+"
+
 
 // *******************************
 //   GNSS : Adafruit ultimate GPS 
@@ -265,8 +268,6 @@ uint8_t send_data_to_slave()
     Serial.print(";");
     gps_measurements();
   
-    Serial.print((int)gnss_receiver.fixquality);
-    Serial.print(";");
     Serial.print((int)gnss_receiver.satellites);
     Serial.print(";");
     Serial.print(new_gps_data, DEC);
