@@ -6,12 +6,17 @@
 #include <Adafruit_GPS.h>
 
 // *******************************
-//          Custom libraries
+//        Custom libraries
 // *******************************
 
 #include "MPU9250.h"
 #include "BMP280.h"
-#include "GPS.h"
+
+#include "tools.h"
+
+// *******************************
+//             Defines
+// *******************************
 
 #define PERIODICITY 100 // ms
 
@@ -21,6 +26,12 @@
 
 #define GPS_TX_PIN 10
 #define GPS_RX_PIN 9
+
+// *******************************
+//        General variables
+// *******************************
+
+uint32_t t_start;
 
 // *******************************
 //    Pressure sensor : BMP280
@@ -34,10 +45,8 @@ double pressure, temperature;
 double altitude_pressure;
 
 // *******************************
-//         IMUs : MPU9250
+//        IMUs : 2x MPU9250
 // *******************************
-
-uint32_t t_start;
 
 // IMU sensor objects
 MPU9250 mpu9250_1(0x68);
@@ -46,10 +55,6 @@ MPU9250 mpu9250_2(0x69);
 // measurements data
 double accel1[3], gyro1[3], mag_meas1[3];
 double accel2[3], gyro2[3], mag_meas2[3];
-
-// data sentence :          ax1    ay1    az1    ax2    ay2    az2    wx1      wy1      wz1      wx2      wy2      wz2      mx1      my1      mz1      mx2      my2      mz2      P          T      zP       lon     d lat     d speed    dir
-char data_sentence[255] = "$+00.00;+00.00;+00.00;+00.00;+00.00;+00.00;+0000.00;+0000.00;+0000.00;+0000.00;+0000.00;+0000.00;+0000.00;+0000.00;+0000.00;+0000.00;+0000.00;+0000.00;+000000.00;+00.00;+0000.00;+000.00;-;+000.00;-;+0000.00;+000.00;+"
-
 
 // *******************************
 //   GNSS : Adafruit ultimate GPS 
@@ -63,7 +68,7 @@ uint8_t new_gps_data;
 
 
 // *******************************
-//               SETUP
+//             SETUP
 // *******************************
 
 void setup() 
@@ -113,44 +118,12 @@ void loop()
   // gather measurements
   while(millis() - t_start < PERIODICITY)
   {
-    gps_measurements(); // reads the measurements from the gps
+    gps_measurements(&gnss_receiver, &gps_serial_bus, &new_gps_data); // reads the measurements from the gps
   }
 
-  send_data_to_slave(); // send data to slave for storage
+  generate_message(t_start, accel1, accel2, gyro1, gyro2, mag_meas1, mag_meas2, pressure, temperature, altitude_pressure, &gnss_receiver, &gps_serial_bus, &new_gps_data);
 
   new_gps_data = 0;
-}
-
-/*
- * Function gps_measurements() :
- *    Gathers the measurements from the gps (low data rates).
- */
-uint8_t gps_measurements()
-{
-  if(gnss_receiver.available() > 0)
-  {
-    if (new_gps_data == 0)
-    {
-      char c = gnss_receiver.read();
-      //Serial.print(c);
-      
-      if(gnss_receiver.newNMEAreceived() && new_gps_data == 0)
-      {
-        if (gnss_receiver.parse(gnss_receiver.lastNMEA()))
-        {
-          Serial.println(gnss_receiver.lastNMEA());
-          new_gps_data = 1;
-        }
-      }
-    }
-    else
-    {
-      char c = gps_serial_bus.read(); // clearing the buffer without processing the data
-      //Serial.print(c);
-    }
-  }
-
-  return 1;
 }
 
 /*
@@ -165,126 +138,12 @@ uint8_t high_rate_measurements()
   mpu9250_1.getRawAccelerationVector(accel1);
   mpu9250_1.getRawAngularVelocityVector(gyro1);
   mpu9250_1.getRawMagVector(mag_meas1);
-  gps_measurements();
+  gps_measurements(&gnss_receiver, &gps_serial_bus, &new_gps_data);
 
   mpu9250_2.getRawAccelerationVector(accel2);
   mpu9250_2.getRawAngularVelocityVector(gyro2);
   mpu9250_2.getRawMagVector(mag_meas2);
-  gps_measurements();
-
-  return 1;
-}
-
-/*
- * Function send_data_to_slave() :
- *    Sends the data as dynamic string of characters. Each data point is separed by the separator ';'.
- */
-uint8_t send_data_to_slave()
-{
-  Serial.print("$");
-  Serial.print(t_start);
-  Serial.print(";");
-  Serial.print(accel1[0]);
-  Serial.print(";");
-  Serial.print(accel1[1]);
-  Serial.print(";");
-  gps_measurements();
-  
-  Serial.print(accel1[2]);
-  Serial.print(";");
-  Serial.print(accel2[0]);
-  Serial.print(";");
-  Serial.print(accel2[1]);
-  Serial.print(";");
-  Serial.print(accel2[2]);
-  Serial.print(";");
-  gps_measurements();
-  
-  Serial.print(gyro1[0]);
-  Serial.print(";");
-  Serial.print(gyro1[1]);
-  Serial.print(";");
-  Serial.print(gyro1[2]);
-  Serial.print(";");
-  gps_measurements();
-  
-  Serial.print(gyro2[0]);
-  Serial.print(";");
-  Serial.print(gyro2[1]);
-  Serial.print(";");
-  Serial.print(gyro2[2]);
-  Serial.print(";");
-  gps_measurements();
-  
-  Serial.print(mag_meas1[0]);
-  Serial.print(";");
-  Serial.print(mag_meas1[1]);
-  Serial.print(";");
-  Serial.print(mag_meas1[2]);
-  Serial.print(";");
-  gps_measurements();
-  
-  Serial.print(mag_meas2[0]);
-  Serial.print(";");
-  Serial.print(mag_meas2[1]);
-  Serial.print(";");
-  Serial.print(mag_meas2[2]);
-  Serial.print(";");
-  gps_measurements();
-  
-  Serial.print(pressure);
-  Serial.print(";");
-  Serial.print(temperature);
-  Serial.print(";");
-  Serial.print(altitude_pressure);
-  Serial.print(";");
-  gps_measurements();
-  
-  //gps
-  if (gnss_receiver.fix)
-  {
-    Serial.print(gnss_receiver.longitude);
-    Serial.print(";");
-    Serial.print(gnss_receiver.lon);
-    Serial.print(";");
-    Serial.print(gnss_receiver.latitude);
-    Serial.print(";");
-    Serial.print(gnss_receiver.lat);
-    Serial.print(";");
-    gps_measurements();
-    Serial.print(gnss_receiver.altitude);
-    Serial.print(";");
-    Serial.print(gnss_receiver.speed);
-    Serial.print(";");
-    Serial.print(gnss_receiver.angle);
-    Serial.print(";"); 
-    gps_measurements();
-
-    Serial.print((gnss_receiver.hour+2)%24, DEC);
-    Serial.print(";");
-    Serial.print(gnss_receiver.minute, DEC);
-    Serial.print(";");
-    Serial.print(gnss_receiver.seconds, DEC);
-    Serial.print(";");
-    gps_measurements();
-  
-    Serial.print((int)gnss_receiver.satellites);
-    Serial.print(";");
-    Serial.print(new_gps_data, DEC);
-    Serial.print(";");
-    Serial.print((int)gnss_receiver.fix, DEC);
-    Serial.println("*");
-    gps_measurements();
-    
-    digitalWrite(MASTER_PIN_LED_FIX,1);
-  }
-  else
-  {
-    Serial.println("0.00;E;0.00;N;0.00;0.00;0.00;0.00;0.00;0;0;0;0.00;0;0;0*");
-    gps_measurements();
-    
-    digitalWrite(MASTER_PIN_LED_FIX, 0);
-  }
+  gps_measurements(&gnss_receiver, &gps_serial_bus, &new_gps_data);
 
   return 1;
 }
