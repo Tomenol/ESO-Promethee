@@ -4,17 +4,23 @@ uint8_t add_double_variable_to_output_string(
 	double _value, 
 	int _sign_len, 
 	int _dec_len, 
-	int _precision_len)
+	int _precision_len
+	)
 {
-	int _var_len = _sign_len + _dec_len + SEPARATOR_LEN;
+	int _var_len = _sign_len + _dec_len;
 
-  if (_precision_len > 0)
-  {
-    _var_len += _precision_len + 1;
-  }
-  
-  char* str;
-  str = (char*)malloc((_var_len)*sizeof(char)); // allocate memory
+	if (_precision_len > 0)
+	{
+		_var_len += _precision_len + 1;
+	}
+
+	double max_pow_10 =  pow(10.0, _dec_len);
+	
+	if(_value > max_pow_10)
+	{
+		int ovf_vals = (int)(_value/max_pow_10);
+		_value = _value - (double)ovf_vals*max_pow_10;
+	}
 
 	for(int ix = 0; ix < _var_len; ix++)
 	{
@@ -22,14 +28,14 @@ uint8_t add_double_variable_to_output_string(
 		{
 			if (sgn(_value) == 1 || sgn(_value) == 0) // check if value is positive or 0
 			{
-				str[ix] = '+';
+				Serial.print("+");
 			}
 			else
 			{
-				str[ix] = '-';
+				Serial.print("-");
 			}
 
-			_value = _value/sgn(_value); // make the value positive
+			_value = _value*sgn(_value); // make the value positive
 		}
 		else // write each digit in order
 		{
@@ -39,50 +45,42 @@ uint8_t add_double_variable_to_output_string(
 	
 				if (ix - _sign_len < _dec_len)
 				{
-					pow_10 = pow(10.0, (double)(_dec_len - (ix - _dec_len - _sign_len ) - 1));
+					pow_10 = pow(10.0, (double)(_dec_len - (ix - _sign_len)) - 1);
 				}
 				else
 				{
-					pow_10 = pow(10.0, (double)(_dec_len - (ix - _dec_len - _sign_len) - 2));
+					pow_10 = pow(10.0, (double)(_dec_len - (ix - _sign_len)));
 				}
 				
-				char dec = (char)(_value/pow_10);
+				int dec = (int)(_value/pow_10);
 
-				str[ix] = '0' + dec;
+				Serial.print(dec, DEC);
 				_value = _value - (double)dec * pow_10;
 			}
 			else
 			{
-				str[ix] = '.';
+				Serial.print(".");
 			}
 		}
 	}
 
 	// separator
-	str[_var_len] = ';';
+	Serial.print(';');
   
-  uint8_t ret = Serial.print(str);
-  free(str);
   
-  return ret;
+	return 1;
 }
 
 uint8_t add_char_variable_to_output_string(char _value)
 {
-  char* str;
-  str = (char*)malloc(2*sizeof(char)); // allocate memory
+	Serial.print(_value);
+	Serial.print(';');
   
-	str[0] = _value;
-	str[1] = ';';
-
-  uint8_t ret = Serial.print(str);
-  free(str);
-  
-	return ret;
+	return 1;
 }
 
 uint8_t generate_message(
-	int _start_time_ms,
+	uint32_t _start_time_ms,
 	double *_accel1,
 	double *_accel2,
 	double *_gyro1, 
@@ -99,55 +97,48 @@ uint8_t generate_message(
 {
 	// data sentence :                 t_start  ax1    ay1    az1    ax2    ay2    az2    wx1      wy1      wz1      wx2      wy2      wz2      mx1     my1     mz1     mx2     my2     mz2     P          T      zP       lon     d lat     d speed    dir     h  m  s  n  - f
 	// char data_sentence[STR_LEN] = "$0000000;+00.00;+00.00;+00.00;+00.00;+00.00;+00.00;+0000.00;+0000.00;+0000.00;+0000.00;+0000.00;+0000.00;+000.00;+000.00;+000.00;+000.00;+000.00;+000.00;+000000.00;+00.00;+0000.00;;*";
-
-	add_double_variable_to_output_string(_start_time_ms, MS_TIME_SIGN_LEN, MS_TIME_DEC_LEN, MS_TIME_PRECISION_LEN);
+	Serial.print("$");
+	add_double_variable_to_output_string((double)((int32_t)_start_time_ms), MS_TIME_SIGN_LEN, MS_TIME_DEC_LEN, MS_TIME_PRECISION_LEN);
 	gps_measurements(_gps_instance, _gps_serial_bus, _new_gps_data);
 
 	// acceleration
 	add_double_variable_to_output_string(_accel1[0], ACCEL_SIGN_LEN, ACCEL_DEC_LEN, ACCEL_PRECISION_LEN);
 	add_double_variable_to_output_string(_accel1[1], ACCEL_SIGN_LEN, ACCEL_DEC_LEN, ACCEL_PRECISION_LEN);
 	add_double_variable_to_output_string(_accel1[2], ACCEL_SIGN_LEN, ACCEL_DEC_LEN, ACCEL_PRECISION_LEN);
-	gps_measurements(_gps_instance, _gps_serial_bus, _new_gps_data);
 
 	add_double_variable_to_output_string(_accel2[0], ACCEL_SIGN_LEN, ACCEL_DEC_LEN, ACCEL_PRECISION_LEN);
 	add_double_variable_to_output_string(_accel2[1], ACCEL_SIGN_LEN, ACCEL_DEC_LEN, ACCEL_PRECISION_LEN);
 	add_double_variable_to_output_string(_accel2[2], ACCEL_SIGN_LEN, ACCEL_DEC_LEN, ACCEL_PRECISION_LEN);
-	gps_measurements(_gps_instance, _gps_serial_bus, _new_gps_data);
 
 	// gyroscope
 	add_double_variable_to_output_string(_gyro1[0], GYRO_SIGN_LEN, GYRO_DEC_LEN, GYRO_PRECISION_LEN);
 	add_double_variable_to_output_string(_gyro1[1], GYRO_SIGN_LEN, GYRO_DEC_LEN, GYRO_PRECISION_LEN);
 	add_double_variable_to_output_string(_gyro1[2], GYRO_SIGN_LEN, GYRO_DEC_LEN, GYRO_PRECISION_LEN);
-	gps_measurements(_gps_instance, _gps_serial_bus, _new_gps_data);	
-
+ 
 	add_double_variable_to_output_string(_gyro2[0], GYRO_SIGN_LEN, GYRO_DEC_LEN, GYRO_PRECISION_LEN);
 	add_double_variable_to_output_string(_gyro2[1], GYRO_SIGN_LEN, GYRO_DEC_LEN, GYRO_PRECISION_LEN);
 	add_double_variable_to_output_string(_gyro2[2], GYRO_SIGN_LEN, GYRO_DEC_LEN, GYRO_PRECISION_LEN);
-	gps_measurements(_gps_instance, _gps_serial_bus, _new_gps_data);
 
 	// magnetometer
 	add_double_variable_to_output_string(_mag1[0], MAG_SIGN_LEN, MAG_DEC_LEN, MAG_PRECISION_LEN);
 	add_double_variable_to_output_string(_mag1[1], MAG_SIGN_LEN, MAG_DEC_LEN, MAG_PRECISION_LEN);
 	add_double_variable_to_output_string(_mag1[2], MAG_SIGN_LEN, MAG_DEC_LEN, MAG_PRECISION_LEN);
-	gps_measurements(_gps_instance, _gps_serial_bus, _new_gps_data);
 
 	add_double_variable_to_output_string(_mag2[0], MAG_SIGN_LEN, MAG_DEC_LEN, MAG_PRECISION_LEN);
 	add_double_variable_to_output_string(_mag2[1], MAG_SIGN_LEN, MAG_DEC_LEN, MAG_PRECISION_LEN);
 	add_double_variable_to_output_string(_mag2[2], MAG_SIGN_LEN, MAG_DEC_LEN, MAG_PRECISION_LEN);
-	gps_measurements(_gps_instance, _gps_serial_bus, _new_gps_data);
 
 	// Pressure/temp/alt
 	add_double_variable_to_output_string(_pressure, PRESS_SIGN_LEN, PRESS_DEC_LEN, PRESS_PRECISION_LEN);
 	add_double_variable_to_output_string(_temperature, TEMP_SIGN_LEN, TEMP_DEC_LEN, TEMP_PRECISION_LEN);
 	add_double_variable_to_output_string(_alt_pressure, ALT_SIGN_LEN, ALT_DEC_LEN, ALT_PRECISION_LEN);
-	gps_measurements(_gps_instance, _gps_serial_bus, _new_gps_data);
 
 	// GPS
 	if(_gps_instance->fix == 1)
 	{
-		add_double_variable_to_output_string(_gps_instance->longitude, ANG_SIGN_LEN, ANG_DEC_LEN, ANG_PRECISION_LEN);
+		add_double_variable_to_output_string(_gps_instance->longitude/100.00, ANG_SIGN_LEN, ANG_DEC_LEN, ANG_PRECISION_LEN);
 		add_char_variable_to_output_string(_gps_instance->lon);
-		add_double_variable_to_output_string(_gps_instance->latitude, ANG_SIGN_LEN, ANG_DEC_LEN, ANG_PRECISION_LEN);
+		add_double_variable_to_output_string(_gps_instance->latitude/100.0, ANG_SIGN_LEN, ANG_DEC_LEN, ANG_PRECISION_LEN);
 		add_char_variable_to_output_string(_gps_instance->lat);
 		add_double_variable_to_output_string(_gps_instance->altitude, ALT_SIGN_LEN, ALT_DEC_LEN, ALT_PRECISION_LEN);
 
@@ -162,13 +153,12 @@ uint8_t generate_message(
 		add_double_variable_to_output_string(*_new_gps_data, BOOL_SIGN_LEN, BOOL_DEC_LEN, BOOL_PRECISION_LEN);
 		add_double_variable_to_output_string(_gps_instance->fix, BOOL_SIGN_LEN, BOOL_DEC_LEN, BOOL_PRECISION_LEN);
 	}
-  else
-  {
-    Serial.print("+000.00;-;+000.00;-;+0000.00;+000.00;00;00;00;00;0;0;");
-  }
+	else
+	{
+		Serial.print("+000.0000;-;+000.0000;-;+0000.00;+000.0000;00;00;00;00;0;0;");
+	}
 
-  Serial.print("*");
-	gps_measurements(_gps_instance, _gps_serial_bus, _new_gps_data);
+  	Serial.println("*");
 
 	return 1;
 }
@@ -181,24 +171,14 @@ uint8_t gps_measurements(Adafruit_GPS* _gnss_receiver, SoftwareSerial *_gps_seri
 {
   if(_gnss_receiver->available() > 0)
   {
-    if ((*_new_gps_data) == 0)
+    char c = _gnss_receiver->read();    
+    if(_gnss_receiver->newNMEAreceived())
     {
-      char c = _gnss_receiver->read();
-      //Serial.print(c);
-      
-      if(_gnss_receiver->newNMEAreceived() && (*_new_gps_data) == 0)
+      if (_gnss_receiver->parse(_gnss_receiver->lastNMEA()))
       {
-        if (_gnss_receiver->parse(_gnss_receiver->lastNMEA()))
-        {
-          Serial.println(_gnss_receiver->lastNMEA());
-          (*_new_gps_data) = 1;
-        }
+        Serial.println(_gnss_receiver->lastNMEA());
+        (*_new_gps_data) = 1;
       }
-    }
-    else
-    {
-      char c = _gps_serial_bus->read(); // clearing the buffer without processing the data
-      //Serial.print(c);
     }
   }
 

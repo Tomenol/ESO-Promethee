@@ -8,16 +8,14 @@ template <typename T> int sgn(T val) {
     return (T(0) < val) - (val < T(0));
 }
 
-#define STR_LEN 234
-
 // defines the properties of the variables in the data stream
 #define SEPARATOR_LEN 1 // separator = ";"
 #define START_LEN 1 // start = "$"
 #define END_LEN 1 // end = "*"
 
 // Time in ms
-#define MS_TIME_LEN 8
-#define MS_TIME_DEC_LEN 7 // Time is positive
+#define MS_TIME_LEN 11
+#define MS_TIME_DEC_LEN 10 // Time is positive
 #define MS_TIME_SIGN_LEN 0 
 #define MS_TIME_PRECISION_LEN 0 
 
@@ -55,7 +53,7 @@ template <typename T> int sgn(T val) {
 #define ANG_LEN 8 
 #define ANG_DEC_LEN 3 // 3 digits before "."
 #define ANG_SIGN_LEN 1 // an angle is a signed value
-#define ANG_PRECISION_LEN 2 // .00
+#define ANG_PRECISION_LEN 4 // .0000
 
 // Directions in N/S/E/W
 #define DIR_LEN 2 
@@ -144,5 +142,5 @@ template <typename T> int sgn(T val) {
 uint8_t add_double_variable_to_output_string(double _value, int _sign_len, int _dec_len, int _precision_len);
 uint8_t add_char_variable_to_output_string(char _value);
 
-uint8_t generate_message(int _start_time_ms, double *_accel1, double *_accel2, double *_gyro1, double *_gyro2, double *_mag1, double *_mag2, double _pressure, double _temperature, double _alt_pressure, Adafruit_GPS *_gps_instance, SoftwareSerial *_gps_serial_bus, uint8_t *_new_gps_data);
+uint8_t generate_message(uint32_t _start_time_ms, double *_accel1, double *_accel2, double *_gyro1, double *_gyro2, double *_mag1, double *_mag2, double _pressure, double _temperature, double _alt_pressure, Adafruit_GPS *_gps_instance, SoftwareSerial *_gps_serial_bus, uint8_t *_new_gps_data);
 uint8_t gps_measurements(Adafruit_GPS* _gnss_receiver, SoftwareSerial *_gps_serial_bus, uint8_t *_new_gps_data);

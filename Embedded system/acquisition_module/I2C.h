@@ -20,10 +20,10 @@ class I2C
 		static void begin();
 		
 		static uint8_t read8(uint8_t _dev_addr, uint8_t _reg_addr, uint8_t *_data);
-    static uint8_t readBurstRegValue(uint8_t _dev_addr, uint8_t _starting_reg_addr, uint8_t _len, uint8_t* _buffer);
-    static uint8_t read16(uint8_t _dev_addr, uint8_t _reg_addr, uint16_t* _data);
-    static uint8_t read16_LE(uint8_t _dev_addr, uint8_t _reg_addr, uint16_t* _data);
-    static uint8_t read32(uint8_t _dev_addr, uint8_t _starting_reg_addr, uint32_t* _data);
+	    static uint8_t readBurstRegValue(uint8_t _dev_addr, uint8_t _starting_reg_addr, uint8_t _len, uint8_t* _buffer);
+	    static uint8_t read16(uint8_t _dev_addr, uint8_t _reg_addr, uint16_t* _data);
+	    static uint8_t read16_LE(uint8_t _dev_addr, uint8_t _reg_addr, uint16_t* _data);
+	    static uint8_t read32(uint8_t _dev_addr, uint8_t _starting_reg_addr, uint32_t* _data);
 		
 		static uint8_t write8(uint8_t _dev_addr, uint8_t _reg_addr, uint8_t _reg_value);
 		static uint8_t writeBits(uint8_t _dev_addr, uint8_t _reg_addr, uint8_t _msb_start, uint8_t _len, uint8_t _bits);
