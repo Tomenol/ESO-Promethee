@@ -4,7 +4,8 @@ uint8_t add_double_variable_to_output_string(
 	double _value, 
 	int _sign_len, 
 	int _dec_len, 
-	int _precision_len)
+	int _precision_len
+	)
 {
 	int _var_len = _sign_len + _dec_len;
 
@@ -14,6 +15,7 @@ uint8_t add_double_variable_to_output_string(
 	}
 
 	double max_pow_10 =  pow(10.0, _dec_len);
+	
 	if(_value > max_pow_10)
 	{
 		int ovf_vals = (int)(_value/max_pow_10);
@@ -141,9 +143,9 @@ uint8_t generate_message(
 	// GPS
 	if(_gps_instance->fix == 1)
 	{
-		add_double_variable_to_output_string(_gps_instance->longitude, ANG_SIGN_LEN, ANG_DEC_LEN, ANG_PRECISION_LEN);
+		add_double_variable_to_output_string(_gps_instance->longitude/100.00, ANG_SIGN_LEN, ANG_DEC_LEN, ANG_PRECISION_LEN);
 		add_char_variable_to_output_string(_gps_instance->lon);
-		add_double_variable_to_output_string(_gps_instance->latitude, ANG_SIGN_LEN, ANG_DEC_LEN, ANG_PRECISION_LEN);
+		add_double_variable_to_output_string(_gps_instance->latitude/100.0, ANG_SIGN_LEN, ANG_DEC_LEN, ANG_PRECISION_LEN);
 		add_char_variable_to_output_string(_gps_instance->lat);
 		add_double_variable_to_output_string(_gps_instance->altitude, ALT_SIGN_LEN, ALT_DEC_LEN, ALT_PRECISION_LEN);
 
@@ -160,7 +162,7 @@ uint8_t generate_message(
 	}
 	else
 	{
-		Serial.print("+000.00;-;+000.00;-;+0000.00;+000.00;00;00;00;00;0;0;");
+		Serial.print("+000.0000;-;+000.0000;-;+0000.00;+000.0000;00;00;00;00;0;0;");
 	}
 
   	Serial.println("*");

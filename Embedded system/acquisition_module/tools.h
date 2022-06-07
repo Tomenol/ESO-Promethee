@@ -1,3 +1,6 @@
+#ifndef TOOLS_H_
+#define TOOLS_H_
+
 #include "Arduino.h"
 
 #include <SoftwareSerial.h>
@@ -55,7 +58,7 @@ template <typename T> int sgn(T val) {
 #define ANG_LEN 8 
 #define ANG_DEC_LEN 3 // 3 digits before "."
 #define ANG_SIGN_LEN 1 // an angle is a signed value
-#define ANG_PRECISION_LEN 2 // .00
+#define ANG_PRECISION_LEN 4 // .0000
 
 // Directions in N/S/E/W
 #define DIR_LEN 2 
@@ -146,3 +149,4 @@ uint8_t add_char_variable_to_output_string(char _value);
 
 uint8_t generate_message(int _start_time_ms, double *_accel1, double *_accel2, double *_gyro1, double *_gyro2, double *_mag1, double *_mag2, double _pressure, double _temperature, double _alt_pressure, Adafruit_GPS *_gps_instance, SoftwareSerial *_gps_serial_bus, uint8_t *_new_gps_data);
 uint8_t gps_measurements(Adafruit_GPS* _gnss_receiver, SoftwareSerial *_gps_serial_bus, uint8_t *_new_gps_data);
+#endif TOOLS_H_
