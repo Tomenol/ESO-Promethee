@@ -29,6 +29,9 @@ class I2C
 		static uint8_t writeBits(uint8_t _dev_addr, uint8_t _reg_addr, uint8_t _msb_start, uint8_t _len, uint8_t _bits);
 
 	private:
-		I2C() {}
+		I2C() 
+		{
+			
+		}
 };
 #endif 
