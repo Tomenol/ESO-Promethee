@@ -52,3 +52,6 @@ The following results showcase the processed flight data and the corresponding a
 #### Predicted altitude using accelerometer/gyrometer integrated measurements, pressure/temperature and the EKF 
 ![data_fusex_z_ekf](https://github.com/Tomenol/ESO-Promethee/assets/54234406/94ca55cf-5f97-4bae-84d3-1439f99e26a6)
 
+The altitude predicted by the EKF is very similar to the one found with the full flight simulation (take-off @ t=5s):
+![image](https://github.com/Tomenol/ESO-Promethee/assets/54234406/fc5f9f08-bc1b-490c-b199-2de8b959d42f)
+
